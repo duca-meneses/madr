@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 
-
 app = FastAPI(title='MADR', summary='Meu Acervo Digital de Romances')
 
 
