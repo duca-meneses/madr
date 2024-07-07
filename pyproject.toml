@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "madr"
+version = "0.1.0"
+description = ""
+authors = ["Carlos Eduardo <ducameneses16@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.12.*"
+fastapi = "^0.111.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
