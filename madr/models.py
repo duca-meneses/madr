@@ -1,7 +1,4 @@
-from datetime import datetime
-
-from sqlalchemy import func
-from sqlalchemy.orm import Mapped, mapped_column, registry
+from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 table_registry = registry()
 
@@ -14,6 +11,24 @@ class Account:
     username: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
-    created_at: Mapped[datetime] = mapped_column(
-        init=False, server_default=func.now()
+
+
+@table_registry.mapped_as_dataclass
+class Novelist:
+    __tablename__ = 'novelists'
+
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    books = Mapped[list['BooK']] = relationship(
+        init=False, back_populates='novelists', cascade='all, delete-orphan'
     )
+
+
+@table_registry.mapped_as_dataclass
+class BooK:
+    __tablename__ = 'books'
+
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    title: Mapped[str] = mapped_column(unique=True)
+    year: Mapped[str]
+    author: Mapped[Novelist] = relationship(init=False, back_populates='books')
