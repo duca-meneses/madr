@@ -19,13 +19,13 @@ class Novelist:
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
-    books = Mapped[list['BooK']] = relationship(
+    books: Mapped[list['Book']] = relationship(
         init=False, back_populates='novelists', cascade='all, delete-orphan'
     )
 
 
 @table_registry.mapped_as_dataclass
-class BooK:
+class Book:
     __tablename__ = 'books'
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
