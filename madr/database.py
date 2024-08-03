@@ -8,6 +8,6 @@ from madr.settings import Settings
 engine = create_async_engine(Settings().DATABASE_URL)
 
 
-async def get_async_engine() -> AsyncGenerator:
+async def get_async_session() -> AsyncGenerator:
     async with AsyncSession(engine) as session:
         yield session
