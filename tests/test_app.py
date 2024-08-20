@@ -1,8 +1,10 @@
 from http import HTTPStatus
 
+from httpx import AsyncClient
 
-def test_read_root(client):
-    response = client.get('/')
+
+async def test_read_root(client: AsyncClient):
+    response = await client.get('/')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'server': 'up'}
