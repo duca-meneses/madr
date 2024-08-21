@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 
-from madr.dependencies import T_Session
+from madr.dependencies import T_CurrentUser, T_Session
 from madr.models import Account
 from madr.schemas import (
     AccountList,
@@ -11,6 +11,7 @@ from madr.schemas import (
     AccountSchema,
     MessageSchema,
 )
+from madr.security import get_password_hash
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -38,7 +39,7 @@ async def create_account(account: AccountSchema, session: T_Session):
     db_account = Account(
         username=account.username,
         email=account.email,
-        password=account.password,
+        password=get_password_hash(account.password),
     )
 
     session.add(db_account)
@@ -73,40 +74,41 @@ async def get_account_by_id(user_id: int, session: T_Session):
     '/{user_id}', response_model=AccountPublic, status_code=HTTPStatus.OK
 )
 async def update_account(
-    user_id: int, account: AccountSchema, session: T_Session
+    user_id: int,
+    account: AccountSchema,
+    session: T_Session,
+    current_user: T_CurrentUser
 ):
-    account_db = await session.scalar(
-        select(Account).where(Account.id == user_id)
-    )
-    if not account_db:
+
+    if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    account_db.email = account.email
-    account_db.username = account.username
-    account_db.password = account.password
+    current_user.email = account.email
+    current_user.username = account.username
+    current_user.password = get_password_hash(account.password)
 
     await session.commit()
-    await session.refresh(account_db)
+    await session.refresh(current_user)
 
-    return account_db
+    return current_user
 
 
 @router.delete(
     '/{user_id}', response_model=MessageSchema, status_code=HTTPStatus.OK
 )
-async def delete_account(user_id: int, session: T_Session):
-    account_db = await session.scalar(
-        select(Account).where(Account.id == user_id)
-    )
-
-    if not account_db:
+async def delete_account(
+    user_id: int,
+    session: T_Session,
+    current_user: T_CurrentUser
+):
+    if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    await session.delete(account_db)
+    await session.delete(current_user)
     await session.commit()
 
     return {'message': 'User deleted successfully'}
