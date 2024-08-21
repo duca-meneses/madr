@@ -12,6 +12,7 @@ from testcontainers.postgres import PostgresContainer
 from madr.app import app
 from madr.database import get_async_session
 from madr.models import Account, table_registry
+from madr.security import get_password_hash
 
 
 class AccountFactory(Factory):
@@ -61,10 +62,36 @@ async def client(session: AsyncSession):
 @pytest.fixture
 async def user(faker: Generator, session: AsyncSession) -> Account:
     password = faker.password()
-    new_user = AccountFactory(password=password)
+    new_user = AccountFactory(password=get_password_hash(password))
 
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
 
+    new_user.clean_password = password
+
     return new_user
+
+
+@pytest.fixture
+async def other_user(faker: Generator, session: AsyncSession):
+    pwd = faker.password()
+    user = AccountFactory(password=get_password_hash(pwd))
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    user.clean_password = pwd  # Monkey patch
+
+    return user
+
+
+@pytest.fixture
+async def token(client: AsyncClient, user: Account):
+    response = await client.post(
+        '/auth/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+
+    return response.json()['access_token']

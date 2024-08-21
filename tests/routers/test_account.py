@@ -94,7 +94,7 @@ async def test_get_by_id_without_account(client):
 
 
 @pytest.mark.asyncio
-async def test_update_account(client: AsyncClient, user):
+async def test_update_account(client: AsyncClient, user: Account, token):
     response = await client.put(
         f'/users/{user.id}',
         json={
@@ -102,6 +102,7 @@ async def test_update_account(client: AsyncClient, user):
             'email': 'test2@email.com',
             'password': 'test2password',
         },
+        headers={'Authorization': f'Bearer {token}'}
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -123,13 +124,34 @@ async def test_update_account_not_found(client: AsyncClient, user):
         },
     )
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Not authenticated'}
 
 
 @pytest.mark.asyncio
-async def test_delete_account(client: AsyncClient, user):
-    response = await client.delete('/users/1')
+async def test_update_account_not_enough_permissions(
+    client: AsyncClient, other_user: Account, token
+):
+    response = await client.put(
+        f'/users/{other_user.id}',
+        json={
+            'username': 'new',
+            'email': 'new@test.com',
+            'password': 'newpassword',
+        },
+        headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+@pytest.mark.asyncio
+async def test_delete_account(client: AsyncClient, user: Account, token):
+    response = await client.delete(
+        '/users/1',
+        headers={'Authorization': f'Bearer {token}'}
+        )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted successfully'}
@@ -139,5 +161,18 @@ async def test_delete_account(client: AsyncClient, user):
 async def test_delete_without_account(client: AsyncClient):
     response = await client.delete('/users/1')
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Not authenticated'}
+
+
+@pytest.mark.asyncio
+async def test_delete_account_not_enough_permissions(
+    client: AsyncClient, other_user: Account, token
+):
+    response = await client.delete(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
