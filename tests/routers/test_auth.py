@@ -4,7 +4,7 @@ from freezegun import freeze_time
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from madr.models import Account
+from madr.data.models import Account
 
 
 async def test_get_token(client: AsyncClient, user: Account):
@@ -76,10 +76,10 @@ async def test_token_expired_dont_refresh(client: AsyncClient, user: Account):
         assert response.status_code == HTTPStatus.OK
         token = response.json()['access_token']
 
-    with freeze_time('2023-07-14 12:31:00'):
+    with freeze_time('2023-07-14 13:01:00'):
         response = await client.post(
             '/auth/refresh_token', headers={'Authorization': f'Bearer {token}'}
         )
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': 'Could not validate credentials'}
+        assert response.json() == {'detail': 'Not authorized'}

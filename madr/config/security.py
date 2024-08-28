@@ -10,10 +10,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from zoneinfo import ZoneInfo
 
-from madr.database import get_async_session
-from madr.models import Account
-from madr.schemas import TokenData
-from madr.settings import Settings
+from madr.config.settings import Settings
+from madr.data.database import get_async_session
+from madr.data.models import Account
+from madr.schemas.auth import TokenData
 
 settings = Settings()
 pwd_context = PasswordHash.recommended()
@@ -51,7 +51,7 @@ async def get_current_user(
 ):
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
-        detail='Could not validate credentials',
+        detail='Not authorized',
         headers={'WWW-Authenticate': 'Bearer'},
     )
 

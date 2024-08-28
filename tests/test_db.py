@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from madr.models import Account
+from madr.data.models import Account
 
 
 async def test_create_account(session: AsyncSession):

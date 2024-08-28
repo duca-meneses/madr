@@ -3,10 +3,10 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 
-from madr.dependencies import T_CurrentUser, T_FormData, T_Session
-from madr.models import Account
-from madr.schemas import Token
-from madr.security import create_access_token, verify_password
+from madr.config.security import create_access_token, verify_password
+from madr.data.models import Account
+from madr.schemas.auth import Token
+from madr.utils.dependencies import T_CurrentUser, T_FormData, T_Session
 
 router = APIRouter(prefix='/auth', tags=['auth'])
 

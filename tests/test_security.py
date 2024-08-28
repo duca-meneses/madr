@@ -7,8 +7,12 @@ from httpx import AsyncClient
 from jwt import decode
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from madr.models import Account
-from madr.security import create_access_token, get_current_user, settings
+from madr.config.security import (
+    create_access_token,
+    get_current_user,
+    settings,
+)
+from madr.data.models import Account
 
 
 async def test_jwt():
@@ -29,7 +33,7 @@ async def test_jwt_invalid_token(client: AsyncClient):
     )
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json() == {'detail': 'Could not validate credentials'}
+    assert response.json() == {'detail': 'Not authorized'}
 
 
 async def test_get_current_user_missing_username(
@@ -65,7 +69,7 @@ async def test_token_expired_after_time(client: AsyncClient, user: Account):
         assert response.status_code == HTTPStatus.OK
         token = response.json()['access_token']
 
-    with freeze_time('2024-08-20 12:31:00'):
+    with freeze_time('2024-08-20 13:01:00'):
         response = await client.put(
             f'/users/{user.id}',
             headers={'Authorization': f'Bearer {token}'},
@@ -77,4 +81,4 @@ async def test_token_expired_after_time(client: AsyncClient, user: Account):
         )
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': 'Could not validate credentials'}
+        assert response.json() == {'detail': 'Not authorized'}

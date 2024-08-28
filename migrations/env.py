@@ -7,8 +7,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from madr.models import table_registry
-from madr.settings import Settings
+from madr.data.models import table_registry
+from madr.config.settings import Settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

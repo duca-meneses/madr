@@ -3,7 +3,7 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from madr.settings import Settings
+from madr.config.settings import Settings
 
 engine = create_async_engine(Settings().DATABASE_URL)
 
