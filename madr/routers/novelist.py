@@ -3,15 +3,15 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import select
 
-from madr.dependencies import T_CurrentUser, T_Session
-from madr.models import Novelist
-from madr.schemas import (
-    MessageSchema,
+from madr.data.models import Novelist
+from madr.schemas.message import MessageSchema
+from madr.schemas.novelist import (
     NovelistListAll,
     NovelistPublic,
     NovelistSchema,
     NovelistUpdate,
 )
+from madr.utils.dependencies import T_CurrentUser, T_Session
 from madr.utils.sanitize import sanitize_data
 
 router = APIRouter(prefix='/novelist', tags=['novelist'])
