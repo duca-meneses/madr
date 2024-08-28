@@ -10,9 +10,9 @@ from sqlalchemy.ext.asyncio import (
 from testcontainers.postgres import PostgresContainer
 
 from madr.app import app
-from madr.database import get_async_session
-from madr.models import Account, table_registry
-from madr.security import get_password_hash
+from madr.config.security import get_password_hash
+from madr.data.database import get_async_session
+from madr.data.models import Account, table_registry
 
 
 class AccountFactory(Factory):

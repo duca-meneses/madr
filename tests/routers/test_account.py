@@ -4,8 +4,8 @@ import pytest
 from faker import Faker
 from httpx import AsyncClient
 
-from madr.models import Account
-from madr.schemas import AccountPublic
+from madr.data.models import Account
+from madr.schemas.account import AccountPublic
 
 
 @pytest.mark.asyncio
