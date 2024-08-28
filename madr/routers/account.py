@@ -3,17 +3,17 @@ from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 
-from madr.dependencies import T_CurrentUser, T_Session
-from madr.models import Account
-from madr.schemas import (
+from madr.config.security import get_password_hash
+from madr.data.models import Account
+from madr.schemas.account import (
     AccountList,
     AccountPublic,
     AccountSchema,
-    MessageSchema,
 )
-from madr.security import get_password_hash
+from madr.schemas.message import MessageSchema
+from madr.utils.dependencies import T_CurrentUser, T_Session
 
-router = APIRouter(prefix='/users', tags=['users'])
+router = APIRouter(prefix='/users', tags=['account'])
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=AccountPublic)
