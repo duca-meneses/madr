@@ -20,8 +20,8 @@ router = APIRouter(prefix='/users', tags=['account'])
 async def create_account(account: AccountSchema, session: T_Session):
     db_account = await session.scalar(
         select(Account).where(
-            (Account.username == account.username) |
-            (Account.email == account.email)
+            (Account.username == account.username)
+            | (Account.email == account.email)
         )
     )
 
@@ -77,9 +77,8 @@ async def update_account(
     user_id: int,
     account: AccountSchema,
     session: T_Session,
-    current_user: T_CurrentUser
+    current_user: T_CurrentUser,
 ):
-
     if current_user.id != user_id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
@@ -99,9 +98,7 @@ async def update_account(
     '/{user_id}', response_model=MessageSchema, status_code=HTTPStatus.OK
 )
 async def delete_account(
-    user_id: int,
-    session: T_Session,
-    current_user: T_CurrentUser
+    user_id: int, session: T_Session, current_user: T_CurrentUser
 ):
     if current_user.id != user_id:
         raise HTTPException(

@@ -23,7 +23,6 @@ router = APIRouter(prefix='/novelist', tags=['novelist'])
 async def create_novelist(
     novelist: NovelistSchema, user: T_CurrentUser, session: T_Session
 ):
-
     db_novelist = await session.scalar(
         select(Novelist).where(Novelist.name == novelist.name)
     )
@@ -31,12 +30,10 @@ async def create_novelist(
     if db_novelist:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='novelist already on the MADR'
+            detail='novelist already on the MADR',
         )
 
-    db_novelist = Novelist(
-        name=sanitize_data(novelist.name)
-    )
+    db_novelist = Novelist(name=sanitize_data(novelist.name))
 
     session.add(db_novelist)
     await session.commit()
@@ -51,22 +48,19 @@ async def list_novelist(
     user: T_CurrentUser,
     name: str = Query(None),
     offset: int = Query(None),
-    limit: int = Query(10)
+    limit: int = Query(10),
 ):
     query = select(Novelist)
     if name:
         query = query.filter(Novelist.name.contains(name))
 
-    novelists = await session.scalars(
-        query.offset(offset).limit(limit))
+    novelists = await session.scalars(query.offset(offset).limit(limit))
 
     return {'novelists': novelists}
 
 
 @router.get(
-    '/{novelist_id}',
-    status_code=HTTPStatus.OK,
-    response_model=NovelistPublic
+    '/{novelist_id}', status_code=HTTPStatus.OK, response_model=NovelistPublic
 )
 async def get_novelist_by_id(
     novelist_id: int, session: T_Session, user: T_CurrentUser
@@ -78,7 +72,7 @@ async def get_novelist_by_id(
     if not db_novelist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Novelist not listed in MADR'
+            detail='Novelist not listed in MADR',
         )
 
     return db_novelist
@@ -91,7 +85,7 @@ async def update_novelist(
     novelist_id: int,
     novelist: NovelistUpdate,
     session: T_Session,
-    user: T_CurrentUser
+    user: T_CurrentUser,
 ):
     db_novelist = await session.scalar(
         select(Novelist).where(Novelist.id == novelist_id)
@@ -100,7 +94,7 @@ async def update_novelist(
     if not db_novelist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Novelist not listed in MADR'
+            detail='Novelist not listed in MADR',
         )
 
     novelist_name = sanitize_data(novelist.name)
@@ -111,7 +105,7 @@ async def update_novelist(
     if db_novelist_name:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='novelist already on the MADR'
+            detail='novelist already on the MADR',
         )
 
     db_novelist.name = novelist_name
@@ -136,7 +130,7 @@ async def delete_novelist(
     if not db_novelist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Novelist not listed in MADR'
+            detail='Novelist not listed in MADR',
         )
 
     await session.delete(db_novelist)

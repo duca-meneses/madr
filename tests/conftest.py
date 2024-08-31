@@ -12,7 +12,9 @@ from testcontainers.postgres import PostgresContainer
 from madr.app import app
 from madr.config.security import get_password_hash
 from madr.data.database import get_async_session
-from madr.data.models import Account, table_registry
+from madr.data.models import Account, Book, Novelist, table_registry
+from madr.schemas.book import BookPublic
+from madr.schemas.novelist import NovelistPublic
 
 
 class AccountFactory(Factory):
@@ -22,6 +24,22 @@ class AccountFactory(Factory):
     username = Sequence(lambda x: f'test{x}')
     email = LazyAttribute(lambda obj: f'{obj.username}@test.com')
     password = LazyAttribute(lambda obj: f'{obj.username}@10')
+
+
+class NovelistFactory(Factory):
+    class Meta:
+        model = Novelist
+
+    name = Sequence(lambda x: f'test{x}')
+
+
+class BookFactory(Factory):
+    class Meta:
+        model = Book
+
+    title = Sequence(lambda x: f'test title {x}')
+    year = Sequence(lambda y: f'20{y}')
+    author_id = 1
 
 
 @pytest.fixture(scope='session')
@@ -95,3 +113,36 @@ async def token(client: AsyncClient, user: Account):
     )
 
     return response.json()['access_token']
+
+
+@pytest.fixture
+async def novelist(session: AsyncSession) -> NovelistPublic:
+    novelist = NovelistFactory()
+
+    session.add(novelist)
+    await session.commit()
+    await session.refresh(novelist)
+
+    return novelist
+
+
+@pytest.fixture
+async def other_novelist(session: AsyncSession) -> NovelistPublic:
+    novelist = NovelistFactory()
+
+    session.add(novelist)
+    await session.commit()
+    await session.refresh(novelist)
+
+    return novelist
+
+
+@pytest.fixture
+async def book(session: AsyncSession, novelist: NovelistPublic) -> BookPublic:
+    book = BookFactory(author_id=novelist.id)
+
+    session.add(book)
+    await session.commit()
+    await session.refresh(book)
+
+    return book

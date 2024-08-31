@@ -12,10 +12,7 @@ router = APIRouter(prefix='/auth', tags=['auth'])
 
 
 @router.post('/token', response_model=Token)
-async def login_for_access_token(
-    session: T_Session,
-    form_data: T_FormData
-):
+async def login_for_access_token(session: T_Session, form_data: T_FormData):
     user = await session.scalar(
         select(Account).where(Account.email == form_data.username)
     )
