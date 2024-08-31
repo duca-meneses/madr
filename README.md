@@ -15,7 +15,7 @@
  <a href="#routes">Endpoints da API</a> •
 </p>
 
-MADR é o desafio de conclusão do curso do [FastAPI do Zero](fastapidozero.dunossauro.com) do [dunossauro](https://github.com/dunossauro/)
+MADR é o desafio de conclusão do curso [FastAPI do Zero](fastapidozero.dunossauro.com) do [dunossauro](https://github.com/dunossauro/)
 
 O Desafio consiste em criar Api para uma versão simplificado de um acervo digital de livros com python e com framework FastAPI
 
