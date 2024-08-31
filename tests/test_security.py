@@ -63,7 +63,7 @@ async def test_token_expired_after_time(client: AsyncClient, user: Account):
     with freeze_time('2024-08-20 12:00:00'):
         response = await client.post(
             '/auth/token',
-            data={'username': user.email, 'password': user.clean_password}
+            data={'username': user.email, 'password': user.clean_password},
         )
 
         assert response.status_code == HTTPStatus.OK
@@ -77,7 +77,7 @@ async def test_token_expired_after_time(client: AsyncClient, user: Account):
                 'username': 'wrong',
                 'email': 'wrong@example.com',
                 'password': 'wrong',
-            }
+            },
         )
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
