@@ -46,8 +46,7 @@ def create_access_token(data: dict):
 
 
 async def get_current_user(
-    session: T_Session,
-    token: str = Depends(oauth2_scheme)
+    session: T_Session, token: str = Depends(oauth2_scheme)
 ):
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,

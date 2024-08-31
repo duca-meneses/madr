@@ -22,8 +22,7 @@ async def create_book(
 
     if db_book:
         raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail='book already on the MADR'
+            status_code=HTTPStatus.CONFLICT, detail='book already on the MADR'
         )
 
     db_book = Book(
@@ -40,18 +39,18 @@ async def create_book(
 
 
 @router.get('/', status_code=HTTPStatus.OK, response_model=BookList)
-async def list_books(   # noqa
+async def list_books(  # noqa
     session: T_Session,
     user: T_CurrentUser,
-    name: str = Query(None),
+    title: str = Query(None),
     year: str = Query(None),
     offset: int = Query(None),
     limit: int = Query(10),
 ):
     query = select(Book)
 
-    if name:
-        query = query.filter(Book.title.contains(name))
+    if title:
+        query = query.filter(Book.title.contains(title))
 
     if year:
         query = query.filter(Book.year.contains(year))
@@ -69,8 +68,7 @@ async def get_book_by_id(
 
     if not db_book:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='Book not listed in MADR'
+            status_code=HTTPStatus.NOT_FOUND, detail='Book not listed in MADR'
         )
 
     return db_book
@@ -86,8 +84,7 @@ async def update_book(
 
     if not db_book:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='Book not listed in MADR'
+            status_code=HTTPStatus.NOT_FOUND, detail='Book not listed in MADR'
         )
 
     db_book.year = booK.year
@@ -107,8 +104,7 @@ async def delete_book(book_id: int, session: T_Session, user: T_CurrentUser):
 
     if not db_book:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='Book not listed in MADR'
+            status_code=HTTPStatus.NOT_FOUND, detail='Book not listed in MADR'
         )
 
     await session.delete(db_book)
