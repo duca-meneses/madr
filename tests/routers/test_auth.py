@@ -54,7 +54,7 @@ async def test_token_wrong_email(client: AsyncClient, user: Account):
 
 async def test_refresh_token(client: AsyncClient, token):
     response = await client.post(
-        'auth/refresh_token',
+        'auth/refresh-token',
         headers={'Authorization': f'Bearer {token}'},
     )
 
@@ -78,8 +78,59 @@ async def test_token_expired_dont_refresh(client: AsyncClient, user: Account):
 
     with freeze_time('2023-07-14 13:01:00'):
         response = await client.post(
-            '/auth/refresh_token', headers={'Authorization': f'Bearer {token}'}
+            '/auth/refresh-token', headers={'Authorization': f'Bearer {token}'}
         )
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         assert response.json() == {'detail': 'Not authorized'}
+
+
+async def test_update_password(client: AsyncClient, user: Account, token):
+    response = await client.post(
+        '/auth/password/change',
+        json={
+            'password': user.clean_password,
+            'new_password': 'new_secure_password',
+            'confirm_new_password': 'new_secure_password',
+        },
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'message': 'Password updated successfully'}
+
+
+async def test_update_password_incorrect_current_password(
+    client: AsyncClient, user: Account, token
+):
+    response = await client.post(
+        '/auth/password/change',
+        json={
+            'password': 'wrong_password',
+            'new_password': 'new_secure_password',
+            'confirm_new_password': 'new_secure_password',
+        },
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Incorrect password'}
+
+
+async def test_update_password_incorrect_confirm_new_password(
+    client: AsyncClient, user: Account, token
+):
+    response = await client.post(
+        '/auth/password/change',
+        json={
+            'password': user.clean_password,
+            'new_password': 'new_secure_password',
+            'confirm_new_password': 'different_secure_password',
+        },
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {
+        'detail': 'New password and confirm new password do not match'
+    }
