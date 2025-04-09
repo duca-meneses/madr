@@ -6,6 +6,7 @@ from madr.schemas.account import (
     AccountList,
     AccountPublic,
     AccountSchema,
+    AccountUpdateSchema,
 )
 from madr.schemas.message import MessageSchema
 from madr.services.account_service import AccountService
@@ -39,7 +40,7 @@ async def get_account_by_id(user_id: int, session: T_Session):
 )
 async def update_account(
     user_id: int,
-    account: AccountSchema,
+    account: AccountUpdateSchema,
     session: T_Session,
     current_user: T_CurrentUser
 ):
