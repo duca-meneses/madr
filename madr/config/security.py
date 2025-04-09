@@ -33,11 +33,12 @@ def verify_password(plain_password: str, hashed_password: str):
 def create_access_token(data: dict):
     to_encode = data.copy()
 
-    expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
+    date = datetime.now(tz=ZoneInfo('UTC'))
+    expire = date + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
-
-    to_encode.update({'exp': expire})
+    issue_at = int(date.timestamp())
+    to_encode.update({'exp': expire, 'iat': issue_at})
     encoded_jwt = encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
