@@ -1,7 +1,11 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field
 
 
 class MessageSchema(BaseModel):
-    message: Annotated[str, Field('message of response')]
+    message: Optional[Annotated[
+        str,
+        Field(title='message', description='message to response')
+        ]
+    ]
