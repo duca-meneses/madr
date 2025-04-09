@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from madr.config.security import get_password_hash
 from madr.data.models import Account
-from madr.schemas.account import AccountSchema
+from madr.schemas.account import AccountSchema, AccountUpdateSchema
 from madr.utils.dependencies import T_CurrentUser, T_Session
 
 
@@ -66,7 +66,7 @@ class AccountService():
     async def update_account(
         self,
         user_id: int,
-        account: AccountSchema,
+        account: AccountUpdateSchema,
         current_user: T_CurrentUser,
     ):
         if current_user.id != user_id:
